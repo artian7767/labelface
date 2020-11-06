@@ -44,6 +44,8 @@ from libs.pascal_voc_io import PascalVocReader
 from libs.pascal_voc_io import XML_EXT
 from libs.yolo_io import YoloReader
 from libs.yolo_io import TXT_EXT
+from libs.custom_json_io import CustomJSONReader
+from libs.custom_json_io import JSON_EXT
 from libs.ustr import ustr
 from libs.hashableQListWidgetItem import HashableQListWidgetItem
 
@@ -91,7 +93,7 @@ class MainWindow(QMainWindow, WindowMixin):
         # For loading all image under a directory
         self.mImgList = []
         self.dirname = None
-        self.labelHist = []
+        self.labelHist = ["Face","Leye_OPEN","Leye_CLOSED","Reye_OPEN","Reye_CLOSED","Mouth_OPEN","Mouth_CLOSED","Cigar","Phone"]
         self.lastOpenDir = None
 
         # Whether we need to save or not.
@@ -103,7 +105,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.screencast = "https://youtu.be/p0nR2YsCY_U"
 
         # Load predefined classes to the list
-        self.loadPredefinedClasses(defaultPrefdefClassFile)
+        # self.loadPredefinedClasses(defaultPrefdefClassFile)
 
         # Main widgets and related state.
         self.labelDialog = LabelDialog(parent=self, listItem=self.labelHist)
@@ -231,10 +233,25 @@ class MainWindow(QMainWindow, WindowMixin):
         save = action(getStr('save'), self.saveFile,
                       'Ctrl+S', 'save', getStr('saveDetail'), enabled=False)
 
-        isUsingPascalVoc = self.labelFileFormat == LabelFileFormat.PASCAL_VOC
-        save_format = action('&PascalVOC' if isUsingPascalVoc else '&YOLO',
+        # isUsingPascalVoc = self.labelFileFormat == LabelFileFormat.PASCAL_VOC
+        # save_format = action('&PascalVOC' if isUsingPascalVoc else '&YOLO',
+        #                      self.change_format, 'Ctrl+',
+        #                      'format_voc' if isUsingPascalVoc else 'format_yolo',
+        #                      getStr('changeSaveFormat'), enabled=True)
+        def getFormatMeta(format):
+            """
+            returns a tuple containing (title, icon_name) of the selected format
+            """
+            if format == LabelFileFormat.PASCAL_VOC:
+                return ('&PascalVOC', 'format_voc')
+            elif format == LabelFileFormat.YOLO:
+                return ('&YOLO', 'format_yolo')
+            elif format == LabelFileFormat.CUSTOMJSON:
+                return ('&CustomJSON', 'format_customjson')
+
+        save_format = action(getFormatMeta(self.labelFileFormat)[0],
                              self.change_format, 'Ctrl+',
-                             'format_voc' if isUsingPascalVoc else 'format_yolo',
+                             getFormatMeta(self.labelFileFormat)[1],
                              getStr('changeSaveFormat'), enabled=True)
 
         saveAs = action(getStr('saveAs'), self.saveFileAs,
@@ -515,11 +532,19 @@ class MainWindow(QMainWindow, WindowMixin):
             self.labelFileFormat = LabelFileFormat.YOLO
             LabelFile.suffix = TXT_EXT
 
+        elif save_format == FORMAT_CUSTOMJSON:
+            self.actions.save_format.setText(FORMAT_CUSTOMJSON)
+            self.actions.save_format.setIcon(newIcon("format_customjson"))
+            self.labelFileFormat = LabelFileFormat.CUSTOMJSON
+            LabelFile.suffix = JSON_EXT
+
     def change_format(self):
         if self.labelFileFormat == LabelFileFormat.PASCAL_VOC:
             self.set_format(FORMAT_YOLO)
         elif self.labelFileFormat == LabelFileFormat.YOLO:
             self.set_format(FORMAT_PASCALVOC)
+        elif self.labelFileFormat == LabelFileFormat.CUSTOMJSON:
+            self.set_format(FORMAT_CUSTOMJSON)
         else:
             raise ValueError('Unknown label file format.')
         self.setDirty()
@@ -835,6 +860,11 @@ class MainWindow(QMainWindow, WindowMixin):
                     annotationFilePath += TXT_EXT
                 self.labelFile.saveYoloFormat(annotationFilePath, shapes, self.filePath, self.imageData, self.labelHist,
                                                    self.lineColor.getRgb(), self.fillColor.getRgb())
+            elif self.labelFileFormat == LabelFileFormat.CUSTOMJSON:
+                if annotationFilePath[-4:].lower() != ".json":
+                    annotationFilePath += JSON_EXT
+                self.labelFile.saveCustomJSONFormat(annotationFilePath, shapes, self.filePath, self.imageData, self.labelHist,
+                                                   self.lineColor.getRgb(), self.fillColor.getRgb())
             else:
                 self.labelFile.save(annotationFilePath, shapes, self.filePath, self.imageData,
                                     self.lineColor.getRgb(), self.fillColor.getRgb())
@@ -1086,6 +1116,7 @@ class MainWindow(QMainWindow, WindowMixin):
                 os.path.splitext(filePath)[0])
             xmlPath = os.path.join(self.defaultSaveDir, basename + XML_EXT)
             txtPath = os.path.join(self.defaultSaveDir, basename + TXT_EXT)
+            jsonPath = os.path.join(self.defaultSaveDir, basename + JSON_EXT)
 
             """Annotation file priority:
             PascalXML > YOLO
@@ -1094,6 +1125,8 @@ class MainWindow(QMainWindow, WindowMixin):
                 self.loadPascalXMLByFilename(xmlPath)
             elif os.path.isfile(txtPath):
                 self.loadYOLOTXTByFilename(txtPath)
+            elif os.path.isfile(jsonPath):
+                self.loadCustomJSONByFilename(txtPath)
         else:
             xmlPath = os.path.splitext(filePath)[0] + XML_EXT
             txtPath = os.path.splitext(filePath)[0] + TXT_EXT
@@ -1501,6 +1534,19 @@ class MainWindow(QMainWindow, WindowMixin):
         print (shapes)
         self.loadLabels(shapes)
         self.canvas.verified = tYoloParseReader.verified
+
+    def loadCustomJSONByFilename(self, JSONPath):
+        if self.filePath is None:
+            return
+        if os.path.isfile(JSONPath) is False:
+            return
+
+        self.set_format(FORMAT_CUSTOMJSON)
+
+        tJSONParseReader = CustomJSONReader(JSONPath)
+        shapes = tJSONParseReader.getShapes()
+        self.loadLabels(shapes)
+        self.canvas.verified = tJSONParseReader.verified
 
     def copyPreviousBoundingBoxes(self):
         currIndex = self.mImgList.index(self.filePath)

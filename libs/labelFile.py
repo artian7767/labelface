@@ -1,6 +1,7 @@
 # Copyright (c) 2016 Tzutalin
 # Create by TzuTaLin <tzu.ta.lin@gmail.com>
 
+
 try:
     from PyQt5.QtGui import QImage
 except ImportError:
@@ -9,7 +10,9 @@ except ImportError:
 from base64 import b64encode, b64decode
 from libs.pascal_voc_io import PascalVocWriter
 from libs.yolo_io import YOLOWriter
+from libs.custom_json_io import CustomJSONWriter
 from libs.pascal_voc_io import XML_EXT
+from libs.custom_json_io import JSON_EXT
 from enum import Enum
 import os.path
 import sys
@@ -18,6 +21,7 @@ import sys
 class LabelFileFormat(Enum):
     PASCAL_VOC= 1
     YOLO = 2
+    CUSTOMJSON=3
 
 
 class LabelFileError(Exception):
@@ -93,6 +97,34 @@ class LabelFile(object):
             writer.addBndBox(bndbox[0], bndbox[1], bndbox[2], bndbox[3], label, difficult)
 
         writer.save(targetFile=filename, classList=classList)
+        return
+
+    def saveCustomJSONFormat(self, filename, shapes, imagePath, imageData,
+                            lineColor=None, fillColor=None, databaseSrc=None):
+        imgFolderPath = os.path.dirname(imagePath)
+        imgFolderName = os.path.split(imgFolderPath)[-1]
+        imgFileName = os.path.basename(imagePath)
+
+        if isinstance(imageData, QImage):
+            image = imageData
+        else:
+            image = QImage()
+            image.load(imagePath)
+        imageShape = [image.height(), image.width(),
+                      1 if image.isGrayscale() else 3]
+        writer = CustomJSONWriter(imgFolderName, imgFileName,
+                                 imageShape, localImgPath=imagePath)
+        writer.verified = self.verified
+
+        for shape in shapes:
+            points = shape['points']
+            label = shape['label']
+            # Add Chris
+            difficult = int(shape['difficult'])
+            bndbox = LabelFile.convertPoints2BndBox(points)
+            writer.addBndBox(bndbox[0], bndbox[1], bndbox[2], bndbox[3], label, difficult)
+
+        writer.save(targetFile=filename)
         return
 
     def toggleVerify(self):
