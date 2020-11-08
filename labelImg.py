@@ -88,12 +88,13 @@ class MainWindow(QMainWindow, WindowMixin):
 
         # Save as Pascal voc xml
         self.defaultSaveDir = defaultSaveDir
-        self.labelFileFormat = settings.get(SETTING_LABEL_FILE_FORMAT, LabelFileFormat.PASCAL_VOC)
+        # self.labelFileFormat = settings.get(SETTING_LABEL_FILE_FORMAT, LabelFileFormat.PASCAL_VOC)
+        self.labelFileFormat = settings.get(SETTING_LABEL_FILE_FORMAT, LabelFileFormat.CUSTOMJSON)
 
         # For loading all image under a directory
         self.mImgList = []
         self.dirname = None
-        self.labelHist = ["Face","Leye_OPEN","Leye_CLOSED","Reye_OPEN","Reye_CLOSED","Mouth_OPEN","Mouth_CLOSED","Cigar","Phone"]
+        self.labelHist = PREDEFINED_CLASSES
         self.lastOpenDir = None
 
         # Whether we need to save or not.
@@ -233,11 +234,6 @@ class MainWindow(QMainWindow, WindowMixin):
         save = action(getStr('save'), self.saveFile,
                       'Ctrl+S', 'save', getStr('saveDetail'), enabled=False)
 
-        # isUsingPascalVoc = self.labelFileFormat == LabelFileFormat.PASCAL_VOC
-        # save_format = action('&PascalVOC' if isUsingPascalVoc else '&YOLO',
-        #                      self.change_format, 'Ctrl+',
-        #                      'format_voc' if isUsingPascalVoc else 'format_yolo',
-        #                      getStr('changeSaveFormat'), enabled=True)
         def getFormatMeta(format):
             """
             returns a tuple containing (title, icon_name) of the selected format
@@ -1126,14 +1122,18 @@ class MainWindow(QMainWindow, WindowMixin):
             elif os.path.isfile(txtPath):
                 self.loadYOLOTXTByFilename(txtPath)
             elif os.path.isfile(jsonPath):
-                self.loadCustomJSONByFilename(txtPath)
+                self.loadCustomJSONByFilename(jsonPath)
         else:
             xmlPath = os.path.splitext(filePath)[0] + XML_EXT
             txtPath = os.path.splitext(filePath)[0] + TXT_EXT
+            jsonPath = os.path.splitext(filePath)[0] + JSON_EXT
             if os.path.isfile(xmlPath):
                 self.loadPascalXMLByFilename(xmlPath)
             elif os.path.isfile(txtPath):
                 self.loadYOLOTXTByFilename(txtPath)
+            elif os.path.isfile(txtPath):
+                self.loadCustomJSONByFilename(jsonPath)
+
 
     def resizeEvent(self, event):
         if self.canvas and not self.image.isNull()\
@@ -1251,6 +1251,13 @@ class MainWindow(QMainWindow, WindowMixin):
                 if isinstance(filename, (tuple, list)):
                     filename = filename[0]
             self.loadPascalXMLByFilename(filename)
+        elif self.labelFileFormat == LabelFileFormat.CUSTOMJSON:
+            filters = "Open Annotation JSON file (%s)" % ' '.join(['*.json'])
+            filename = ustr(QFileDialog.getOpenFileName(self,'%s - Choose a json file' % __appname__, path, filters))
+            if filename:
+                if isinstance(filename, (tuple, list)):
+                    filename = filename[0]
+            self.loadCustomJSONByFilename(filename)
 
     def openDirDialog(self, _value=False, dirpath=None, silent=False):
         if not self.mayContinue():

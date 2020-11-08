@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
+import json
 import sys
 
 import codecs
-from libs.constants import DEFAULT_ENCODING
+from libs.constants import DEFAULT_ENCODING,PREDEFINED_CLASSES
 from libs.ustr import ustr
 
 
@@ -12,7 +13,7 @@ ENCODE_METHOD = DEFAULT_ENCODING
 
 class CustomJSONWriter:
 
-    def __init__(self, foldername, filename, imgSize,databaseSrc='Unknown', localImgPath=None):
+    def __init__(self, foldername, filename, imgSize, databaseSrc='Unknown', localImgPath=None):
         self.foldername = foldername
         self.filename = filename
         self.databaseSrc = databaseSrc
@@ -31,7 +32,7 @@ class CustomJSONWriter:
                 self.imgSize is None:
             return None
 
-        top = {
+        dic = {
             'FileInfo': {
                 "FileName": self.filename,
                 "Width": self.imgSize[1],
@@ -55,49 +56,15 @@ class CustomJSONWriter:
                     "Points": [0] * 140,
                 },
                 "BoundingBox": {
-                    # "Face": {
-                    #     "isVisible": True,
-                    #     "Position": [int(face_left), int(face_up), int(face_right) + 1, int(face_down) + 1]
-                    # },
-                    # "L_Eye": {
-                    #     "isVisible": True,
-                    #     "Opened": False if situation.find("졸음재현") != -1 else True,
-                    #     "Position": [int(le_left), int(le_up), int(le_right) + 1, int(le_down) + 1]
-                    # },
-                    # "R_Eye": {
-                    #     "isVisible": True,
-                    #     "Opened": False if situation.find("졸음재현") != -1 else True,
-                    #     "Position": [int(re_left), int(re_up), int(re_right) + 1, int(re_down) + 1]
-                    # },
-                    # "Mouth": {
-                    #     "isVisible": False if isMask == True else True,
-                    #     "Opened": True if situation.find("하품") != -1 else False,
-                    #     "Position": [int(m_left), int(m_up), int(m_right) + 1,
-                    #                  int(m_down) + 1] if isMask == False else [0, 0, 0, 0]
-                    # },
-                    # "Cigar": {
-                    #     "isVisible": isCigar,
-                    #     "Position": [
-                    #         [int(m_left) - 10, int(m_up) - 10, int(m_right) + 10, int(m_down) + 10]] if isCigar else [0,
-                    #                                                                                                   0,
-                    #                                                                                                   0,
-                    #                                                                                                   0]
-                    # },
-                    # "Phone": {
-                    #     "isVisible": isPhone,
-                    #     "Position": [int(face_right) + 1, int(face_up), int(face_right) + 100,
-                    #                  int(face_down)] if isPhone else [0, 0, 0, 0]
-                    # },
+
                 },
 
             }
 
         }
-        # if self.verified:
-        #     top.set('verified', 'yes')
 
 
-        return top
+        return dic
 
     def addBndBox(self, xmin, ymin, xmax, ymax, name, difficult):
         bndbox = {'xmin': xmin, 'ymin': ymin, 'xmax': xmax, 'ymax': ymax}
@@ -105,39 +72,18 @@ class CustomJSONWriter:
         bndbox['difficult'] = difficult
         self.boxlist.append(bndbox)
 
-    def appendObjects(self, dict):
+    def appendObjects(self, diction):
         for each_object in self.boxlist:
-            pass
-            # object_item = SubElement(top, 'object')
-            # name = SubElement(object_item, 'name')
-            # name.text = ustr(each_object['name'])
-            # pose = SubElement(object_item, 'pose')
-            # pose.text = "Unspecified"
-            # truncated = SubElement(object_item, 'truncated')
-            # if int(float(each_object['ymax'])) == int(float(self.imgSize[0])) or (int(float(each_object['ymin']))== 1):
-            #     truncated.text = "1" # max == height or min
-            # elif (int(float(each_object['xmax']))==int(float(self.imgSize[1]))) or (int(float(each_object['xmin']))== 1):
-            #     truncated.text = "1" # max == width or min
-            # else:
-            #     truncated.text = "0"
-            # difficult = SubElement(object_item, 'difficult')
-            # difficult.text = str( bool(each_object['difficult']) & 1 )
-            # bndbox = SubElement(object_item, 'bndbox')
-            # xmin = SubElement(bndbox, 'xmin')
-            # xmin.text = str(each_object['xmin'])
-            # ymin = SubElement(bndbox, 'ymin')
-            # ymin.text = str(each_object['ymin'])
-            # xmax = SubElement(bndbox, 'xmax')
-            # xmax.text = str(each_object['xmax'])
-            # ymax = SubElement(bndbox, 'ymax')
-            # ymax.text = str(each_object['ymax'])
-
+            if each_object['name'] in PREDEFINED_CLASSES:
+                diction["ObjectInfo"]["BoundingBox"][each_object["name"]]["isVisible"]=True
+                diction["ObjectInfo"]["BoundingBox"][each_object["name"]]["Position"]=[int(each_object['xmin']),int(each_object['ymin']),int(each_object['xmax']),int(each_object['ymax'])]
+        return diction
 
     def save(self, targetFile=None):
 
         
-        # root = self.genXML()
-        # self.appendObjects(root)
+        dic = self.genDict()
+        dic=self.appendObjects(dic)
         out_file = None
         if targetFile is None:
             out_file = codecs.open(
@@ -145,8 +91,7 @@ class CustomJSONWriter:
         else:
             out_file = codecs.open(targetFile, 'w', encoding=ENCODE_METHOD)
 
-        # prettifyResult = self.prettify(root)
-        # out_file.write(prettifyResult.decode('utf8'))
+        out_file.write(json.dumps(dic, indent=4, sort_keys=False, ensure_ascii=False))
         out_file.close()
 
 
@@ -156,6 +101,8 @@ class CustomJSONReader:
         # shapes type:
         # [labbel, [(x1,y1), (x2,y2), (x3,y3), (x4,y4)], color, color, difficult]
         self.shapes = []
+        self.json_dic={}
+        self.accessory={}
         self.filepath = filepath
         self.verified = False
         try:
@@ -166,32 +113,32 @@ class CustomJSONReader:
     def getShapes(self):
         return self.shapes
 
+    def getDict(self):
+        return self.json_dic
+
     def addShape(self, label, bndbox, difficult):
-        xmin = int(float(bndbox.find('xmin').text))
-        ymin = int(float(bndbox.find('ymin').text))
-        xmax = int(float(bndbox.find('xmax').text))
-        ymax = int(float(bndbox.find('ymax').text))
+        xmin = int(float(bndbox[0]))
+        ymin = int(float(bndbox[1]))
+        xmax = int(float(bndbox[2]))
+        ymax = int(float(bndbox[3]))
         points = [(xmin, ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax)]
         self.shapes.append((label, points, None, None, difficult))
 
     def parseJSON(self):
         assert self.filepath.endswith(JSON_EXT)
-        # parser = etree.XMLParser(encoding=ENCODE_METHOD)
-        # xmltree = ElementTree.parse(self.filepath, parser=parser).getroot()
-        # filename = xmltree.find('filename').text
-        # try:
-        #     verified = xmltree.attrib['verified']
-        #     if verified == 'yes':
-        #         self.verified = True
-        # except KeyError:
-        #     self.verified = False
-        #
-        # for object_iter in xmltree.findall('object'):
-        #     bndbox = object_iter.find("bndbox")
-        #     label = object_iter.find('name').text
-        #     # Add chris
-        #     difficult = False
-        #     if object_iter.find('difficult') is not None:
-        #         difficult = bool(int(object_iter.find('difficult').text))
-        #     self.addShape(label, bndbox, difficult)
+
+        f = codecs.open(self.filepath, encoding="utf-8")
+        dic=json.loads(f.read())
+        f.close()
+
+        self.json_dic=dic
+
+        for object_name in dic["ObjectInfo"]["BoundingBox"].keys():
+            if dic["ObjectInfo"]["BoundingBox"][object_name]["isVisible"]:
+                label=object_name
+                bndbox=dic["ObjectInfo"]["BoundingBox"][object_name]["Position"]
+                difficult = False
+                self.addShape(label, bndbox, difficult)
+
+
         return True

@@ -18,3 +18,5 @@ FORMAT_CUSTOMJSON='CustomJSON'
 SETTING_DRAW_SQUARE = 'draw/square'
 SETTING_LABEL_FILE_FORMAT= 'labelFileFormat'
 DEFAULT_ENCODING = 'utf-8'
+
+PREDEFINED_CLASSES=["Face","Leye_OPEN","Leye_CLOSED","Reye_OPEN","Reye_CLOSED","Mouth_OPEN","Mouth_CLOSED","Cigar","Phone"]
