@@ -136,9 +136,27 @@ class MainWindow(QMainWindow, WindowMixin):
         self.editButton = QToolButton()
         self.editButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
 
+        # Create a widget for edit and mask button
+        self.maskButton = QCheckBox(getStr('useMask'))
+        self.maskButton.setChecked(False)
+        self.maskButton.stateChanged.connect(self.btnstate)
+
+        # Create a widget for edit and glasses button
+        self.glassesButton = QCheckBox(getStr('useGlasses'))
+        self.glassesButton.setChecked(False)
+        self.glassesButton.stateChanged.connect(self.btnstate)
+
+        # Create a widget for edit and Cap button
+        self.capButton = QCheckBox(getStr('useCap'))
+        self.capButton.setChecked(False)
+        self.capButton.stateChanged.connect(self.btnstate)
+
         # Add some of widgets to listLayout
         listLayout.addWidget(self.editButton)
-        listLayout.addWidget(self.diffcButton)
+        # listLayout.addWidget(self.diffcButton)
+        listLayout.addWidget(self.maskButton)
+        listLayout.addWidget(self.glassesButton)
+        listLayout.addWidget(self.capButton)
         listLayout.addWidget(useDefaultLabelContainer)
 
         # Create and add combobox for showing unique labels in group
@@ -716,6 +734,10 @@ class MainWindow(QMainWindow, WindowMixin):
         if not item: # If not selected Item, take the first one
             item = self.labelList.item(self.labelList.count()-1)
 
+        difficult = self.diffcButton.isChecked()
+        difficult = self.maskButton.isChecked()
+        difficult = self.\
+            cButton.isChecked()
         difficult = self.diffcButton.isChecked()
 
         try:
