@@ -11,9 +11,9 @@
         "Age": 42
     },
     "Accessory": {
-        "Mask": 0,
-        "Glasses": 0,
-        "Cap": 0
+        "Mask": false,
+        "Glasses": false,
+        "Cap": false
     },
     "Annotation": 1,
     "ObjectInfo": {

@@ -95,7 +95,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.labelHist = PREDEFINED_CLASSES
         self.lastOpenDir = None
 
-        self.Acce=[False,False,False]
+        self.Acce={False,False,False} #[Mask,Glasses,Cap]
         self.UserInfo=[0,0,0]
 
         # Whether we need to save or not.
@@ -139,17 +139,17 @@ class MainWindow(QMainWindow, WindowMixin):
         # Create a widget for edit and mask button
         self.maskButton = QCheckBox(getStr('useMask'))
         self.maskButton.setChecked(False)
-        self.maskButton.stateChanged.connect(self.btnstate)
+        self.maskButton.stateChanged.connect(self.btnstate_mask)
 
         # Create a widget for edit and glasses button
         self.glassesButton = QCheckBox(getStr('useGlasses'))
         self.glassesButton.setChecked(False)
-        self.glassesButton.stateChanged.connect(self.btnstate)
+        self.glassesButton.stateChanged.connect(self.btnstate_glasses)
 
         # Create a widget for edit and Cap button
         self.capButton = QCheckBox(getStr('useCap'))
         self.capButton.setChecked(False)
-        self.capButton.stateChanged.connect(self.btnstate)
+        self.capButton.stateChanged.connect(self.btnstate_cap)
 
         # Add some of widgets to listLayout
         listLayout.addWidget(self.editButton)
@@ -735,10 +735,6 @@ class MainWindow(QMainWindow, WindowMixin):
             item = self.labelList.item(self.labelList.count()-1)
 
         difficult = self.diffcButton.isChecked()
-        difficult = self.maskButton.isChecked()
-        difficult = self.\
-            cButton.isChecked()
-        difficult = self.diffcButton.isChecked()
 
         try:
             shape = self.itemsToShapes[item]
@@ -753,6 +749,46 @@ class MainWindow(QMainWindow, WindowMixin):
                 self.canvas.setShapeVisible(shape, item.checkState() == Qt.Checked)
         except:
             pass
+
+
+    def btnstate_mask(self):
+        if not self.canvas.editing():
+            return
+
+        mask = self.maskButton.isChecked()
+        try:
+            if self.Acce[0]!=mask:
+                self.Acce[0]=mask
+                self.setDirty()
+        except:
+            pass
+
+
+
+    def btnstate_glasses(self):
+        if not self.canvas.editing():
+            return
+
+        glasses = self.glassesButton.isChecked()
+        try:
+            if self.Acce[1] != glasses:
+                self.Acce[1] = glasses
+                self.setDirty()
+        except:
+            pass
+
+    def btnstate_cap(self):
+        if not self.canvas.editing():
+            return
+
+        cap = self.capButton.isChecked()
+        try:
+            if self.Acce[2] != cap:
+                self.Acce[2] = cap
+                self.setDirty()
+        except:
+            pass
+
 
     # React to canvas signals.
     def shapeSelectionChanged(self, selected=False):
@@ -1533,10 +1569,13 @@ class MainWindow(QMainWindow, WindowMixin):
         tYoloParseReader = YoloReader(txtPath)
         shapes = tYoloParseReader.getShapes()
         dic=tYoloParseReader.getDict()
-        self.Acce=[1 if dic["Accessory"]["Mask"] else 0,1 if dic["Accessory"]["Glasses"] else 0,1 if dic["Accessory"]["Cap"] else 0]
+        self.Acce=[dic["Accessory"]["Mask"],dic["Accessory"]["Glasses"],dic["Accessory"]["Cap"]]
         self.UserInfo=[dic["UserInfo"]["ID"],dic["UserInfo"]["Gender"],dic["UserInfo"]["Age"]]
         print (shapes)
         self.loadLabels(shapes)
+        self.maskButton.setChecked(dic["Accessory"]["Mask"])
+        self.glassesButton.setChecked(dic["Accessory"]["Glasses"])
+        self.capButton.setChecked(dic["Accessory"]["Cap"])
         self.canvas.verified = tYoloParseReader.verified
 
     def copyPreviousBoundingBoxes(self):

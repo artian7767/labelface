@@ -15,7 +15,7 @@ ENCODE_METHOD = DEFAULT_ENCODING
 
 class YOLOWriter:
 
-    def __init__(self, foldername, filename, imgSize, Acce,UserInfo,databaseSrc='Unknown', localImgPath=None,):
+    def __init__(self, foldername, filename, imgSize, Acce,UserInfo,databaseSrc='Unknown', localImgPath=None):
         self.foldername = foldername
         self.filename = filename
         self.databaseSrc = databaseSrc
@@ -50,8 +50,8 @@ class YOLOWriter:
             },
             "Accessory": {
                 "Mask": self.Acce[0],
-                "Glasses": self.Acce[0],
-                "Cap": self.Acce[0],
+                "Glasses": self.Acce[1],
+                "Cap": self.Acce[2],
             },
             "Annotation": 1,
             "ObjectInfo": {
