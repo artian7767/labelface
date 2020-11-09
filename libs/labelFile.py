@@ -21,7 +21,7 @@ import sys
 class LabelFileFormat(Enum):
     PASCAL_VOC= 1
     YOLO = 2
-    CUSTOMJSON=3
+    CustomJSON=3
 
 
 class LabelFileError(Exception):
@@ -31,7 +31,8 @@ class LabelFileError(Exception):
 class LabelFile(object):
     # It might be changed as window creates. By default, using XML ext
     # suffix = '.lif'
-    suffix = XML_EXT
+    # suffix = XML_EXT
+    suffix = JSON_EXT
 
     def __init__(self, filename=None):
         self.shapes = ()
@@ -99,8 +100,8 @@ class LabelFile(object):
         writer.save(targetFile=filename, classList=classList)
         return
 
-    def saveCustomJSONFormat(self, filename, shapes, imagePath, imageData,
-                            lineColor=None, fillColor=None, databaseSrc=None):
+    def saveCustomJSONFormat(self, filename, shapes, imagePath, imageData,acce,userinfo,
+                            lineColor=None, fillColor=None, databaseSrc=None,):
         imgFolderPath = os.path.dirname(imagePath)
         imgFolderName = os.path.split(imgFolderPath)[-1]
         imgFileName = os.path.basename(imagePath)
@@ -113,7 +114,7 @@ class LabelFile(object):
         imageShape = [image.height(), image.width(),
                       1 if image.isGrayscale() else 3]
         writer = CustomJSONWriter(imgFolderName, imgFileName,
-                                 imageShape, localImgPath=imagePath)
+                                 imageShape,Acce=acce,UserInfo=userinfo, localImgPath=imagePath,)
         writer.verified = self.verified
 
         for shape in shapes:

@@ -13,12 +13,14 @@ ENCODE_METHOD = DEFAULT_ENCODING
 
 class CustomJSONWriter:
 
-    def __init__(self, foldername, filename, imgSize, databaseSrc='Unknown', localImgPath=None):
+    def __init__(self, foldername, filename, imgSize, Acce,UserInfo,databaseSrc='Unknown', localImgPath=None,):
         self.foldername = foldername
         self.filename = filename
         self.databaseSrc = databaseSrc
         self.imgSize = imgSize
         self.boxlist = []
+        self.Acce=Acce
+        self.UserInfo=UserInfo
         self.localImgPath = localImgPath
         self.verified = False
 
@@ -39,16 +41,16 @@ class CustomJSONWriter:
                 "Height": self.imgSize[0],
                 "Channel": self.imgSize[2] if len(self.imgSize) == 3 else 1,
             },
-            # "UserInfo": {
-            #     "ID": 0,
-            #     "Gender": 0,
-            #     "Age": 0,
-            # },
-            # "Accessory": {
-            #     "Mask": False,
-            #     "Glasses": False,
-            #     "Cap": False
-            # },
+            "UserInfo": {
+                "ID": self.UserInfo[0],
+                "Gender": self.UserInfo[1],
+                "Age": self.UserInfo[2],
+            },
+            "Accessory": {
+                "Mask": self.Acce[0],
+                "Glasses": self.Acce[0],
+                "Cap": self.Acce[0],
+            },
             "Annotation": 1,
             "Object_Info": {
                 'KeyPoints': {
@@ -75,8 +77,18 @@ class CustomJSONWriter:
     def appendObjects(self, diction):
         for each_object in self.boxlist:
             if each_object['name'] in PREDEFINED_CLASSES:
-                diction["ObjectInfo"]["BoundingBox"][each_object["name"]]["isVisible"]=True
-                diction["ObjectInfo"]["BoundingBox"][each_object["name"]]["Position"]=[int(each_object['xmin']),int(each_object['ymin']),int(each_object['xmax']),int(each_object['ymax'])]
+                sp=each_object['name'].split("_")
+                if len(sp)==2:
+                    diction["ObjectInfo"]["BoundingBox"][sp[0]]["isVisible"] = True
+                    diction["ObjectInfo"]["BoundingBox"][sp[0]]["Opened"] = True if sp[1]=="OPEN" else False
+                    diction["ObjectInfo"]["BoundingBox"][sp[0]]["Position"] = [int(each_object['xmin']),
+                                                                                             int(each_object['ymin']),
+                                                                                             int(each_object['xmax']),
+                                                                                             int(each_object['ymax'])]
+
+                else:
+                    diction["ObjectInfo"]["BoundingBox"][each_object["name"]]["isVisible"]=True
+                    diction["ObjectInfo"]["BoundingBox"][each_object["name"]]["Position"]=[int(each_object['xmin']),int(each_object['ymin']),int(each_object['xmax']),int(each_object['ymax'])]
         return diction
 
     def save(self, targetFile=None):

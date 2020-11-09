@@ -89,13 +89,16 @@ class MainWindow(QMainWindow, WindowMixin):
         # Save as Pascal voc xml
         self.defaultSaveDir = defaultSaveDir
         # self.labelFileFormat = settings.get(SETTING_LABEL_FILE_FORMAT, LabelFileFormat.PASCAL_VOC)
-        self.labelFileFormat = settings.get(SETTING_LABEL_FILE_FORMAT, LabelFileFormat.CUSTOMJSON)
+        self.labelFileFormat = settings.get(SETTING_LABEL_FILE_FORMAT, LabelFileFormat.CustomJSON)
 
         # For loading all image under a directory
         self.mImgList = []
         self.dirname = None
         self.labelHist = PREDEFINED_CLASSES
         self.lastOpenDir = None
+
+        self.Acce=[]
+        self.UserInfo=[]
 
         # Whether we need to save or not.
         self.dirty = False
@@ -242,8 +245,9 @@ class MainWindow(QMainWindow, WindowMixin):
                 return ('&PascalVOC', 'format_voc')
             elif format == LabelFileFormat.YOLO:
                 return ('&YOLO', 'format_yolo')
-            elif format == LabelFileFormat.CUSTOMJSON:
+            elif format == LabelFileFormat.CustomJSON:
                 return ('&CustomJSON', 'format_customjson')
+
 
         save_format = action(getFormatMeta(self.labelFileFormat)[0],
                              self.change_format, 'Ctrl+',
@@ -531,7 +535,7 @@ class MainWindow(QMainWindow, WindowMixin):
         elif save_format == FORMAT_CUSTOMJSON:
             self.actions.save_format.setText(FORMAT_CUSTOMJSON)
             self.actions.save_format.setIcon(newIcon("format_customjson"))
-            self.labelFileFormat = LabelFileFormat.CUSTOMJSON
+            self.labelFileFormat = LabelFileFormat.CustomJSON
             LabelFile.suffix = JSON_EXT
 
     def change_format(self):
@@ -539,7 +543,7 @@ class MainWindow(QMainWindow, WindowMixin):
             self.set_format(FORMAT_YOLO)
         elif self.labelFileFormat == LabelFileFormat.YOLO:
             self.set_format(FORMAT_PASCALVOC)
-        elif self.labelFileFormat == LabelFileFormat.CUSTOMJSON:
+        elif self.labelFileFormat == LabelFileFormat.CustomJSON:
             self.set_format(FORMAT_CUSTOMJSON)
         else:
             raise ValueError('Unknown label file format.')
@@ -856,10 +860,10 @@ class MainWindow(QMainWindow, WindowMixin):
                     annotationFilePath += TXT_EXT
                 self.labelFile.saveYoloFormat(annotationFilePath, shapes, self.filePath, self.imageData, self.labelHist,
                                                    self.lineColor.getRgb(), self.fillColor.getRgb())
-            elif self.labelFileFormat == LabelFileFormat.CUSTOMJSON:
+            elif self.labelFileFormat == LabelFileFormat.CustomJSON:
                 if annotationFilePath[-4:].lower() != ".json":
                     annotationFilePath += JSON_EXT
-                self.labelFile.saveCustomJSONFormat(annotationFilePath, shapes, self.filePath, self.imageData, self.labelHist,
+                self.labelFile.saveCustomJSONFormat(annotationFilePath, shapes, self.filePath, self.imageData, self.Acce, self.UserInfo,self.labelHist,
                                                    self.lineColor.getRgb(), self.fillColor.getRgb())
             else:
                 self.labelFile.save(annotationFilePath, shapes, self.filePath, self.imageData,
@@ -1251,7 +1255,7 @@ class MainWindow(QMainWindow, WindowMixin):
                 if isinstance(filename, (tuple, list)):
                     filename = filename[0]
             self.loadPascalXMLByFilename(filename)
-        elif self.labelFileFormat == LabelFileFormat.CUSTOMJSON:
+        elif self.labelFileFormat == LabelFileFormat.CustomJSON:
             filters = "Open Annotation JSON file (%s)" % ' '.join(['*.json'])
             filename = ustr(QFileDialog.getOpenFileName(self,'%s - Choose a json file' % __appname__, path, filters))
             if filename:
