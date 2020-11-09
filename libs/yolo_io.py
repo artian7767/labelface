@@ -54,13 +54,39 @@ class YOLOWriter:
                 "Cap": self.Acce[0],
             },
             "Annotation": 1,
-            "Object_Info": {
+            "ObjectInfo": {
                 'KeyPoints': {
                     'Count': 0,
                     "Points": [0] * 140,
                 },
                 "BoundingBox": {
-
+                    "Face":{
+                        "isVisible":False,
+                        "Position" : [0,0,0,0]
+                    },
+                    "Leye": {
+                        "isVisible": False,
+                        "Opened":False,
+                        "Position": [0, 0, 0, 0]
+                    },
+                    "Reye": {
+                        "isVisible": False,
+                        "Opened":False,
+                        "Position": [0, 0, 0, 0]
+                    },
+                    "Mouth": {
+                        "isVisible": False,
+                        "Opened":False,
+                        "Position": [0, 0, 0, 0]
+                    },
+                    "Cigar": {
+                        "isVisible": False,
+                        "Position": [0, 0, 0, 0]
+                    },
+                    "Phone": {
+                        "isVisible": False,
+                        "Position": [0, 0, 0, 0]
+                    }
                 },
 
             }
@@ -76,28 +102,30 @@ class YOLOWriter:
         bndbox['difficult'] = difficult
         self.boxlist.append(bndbox)
 
-    def appendObjects(self, diction):
+    def appendObjects(self):
         for each_object in self.boxlist:
             if each_object['name'] in PREDEFINED_CLASSES:
                 sp=each_object['name'].split("_")
                 if len(sp)==2:
-                    diction["ObjectInfo"]["BoundingBox"][sp[0]]["isVisible"] = True
-                    diction["ObjectInfo"]["BoundingBox"][sp[0]]["Opened"] = True if sp[1]=="OPEN" else False
-                    diction["ObjectInfo"]["BoundingBox"][sp[0]]["Position"] = [int(each_object['xmin']),
-                                                                                             int(each_object['ymin']),
-                                                                                             int(each_object['xmax']),
-                                                                                             int(each_object['ymax'])]
+                    self.dic["ObjectInfo"]["BoundingBox"][sp[0]]={
+                        "isVisible":True,
+                        "Opened": True if sp[1]=="OPEN" else False,
+                        "Position": [int(each_object['xmin']),int(each_object['ymin']),int(each_object['xmax']),int(each_object['ymax'])]
+                    }
 
                 else:
-                    diction["ObjectInfo"]["BoundingBox"][each_object["name"]]["isVisible"]=True
-                    diction["ObjectInfo"]["BoundingBox"][each_object["name"]]["Position"]=[int(each_object['xmin']),int(each_object['ymin']),int(each_object['xmax']),int(each_object['ymax'])]
-        return diction
+                    self.dic["ObjectInfo"]["BoundingBox"][each_object['name']] = {
+                        "isVisible": True,
+                        "Position": [int(each_object['xmin']), int(each_object['ymin']), int(each_object['xmax']),
+                                     int(each_object['ymax'])]
+                    }
+
 
     def save(self, targetFile=None):
 
         
-        dic = self.genDict()
-        dic=self.appendObjects(dic)
+        self.dic = self.genDict()
+        self.appendObjects()
         out_file = None
         if targetFile is None:
             out_file = codecs.open(
@@ -105,7 +133,7 @@ class YOLOWriter:
         else:
             out_file = codecs.open(targetFile, 'w', encoding=ENCODE_METHOD)
 
-        out_file.write(json.dumps(dic, indent=4, sort_keys=False, ensure_ascii=False))
+        out_file.write(json.dumps(self.dic, indent=4, sort_keys=False, ensure_ascii=False))
         out_file.close()
 
 

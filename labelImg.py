@@ -86,7 +86,8 @@ class MainWindow(QMainWindow, WindowMixin):
 
         # Save as Pascal voc xml
         self.defaultSaveDir = defaultSaveDir
-        self.labelFileFormat = settings.get(SETTING_LABEL_FILE_FORMAT, LabelFileFormat.PASCAL_VOC)
+        # self.labelFileFormat = settings.get(SETTING_LABEL_FILE_FORMAT, LabelFileFormat.PASCAL_VOC)
+        self.labelFileFormat = settings.get(SETTING_LABEL_FILE_FORMAT, LabelFileFormat.YOLO)
 
         # For loading all image under a directory
         self.mImgList = []
@@ -94,8 +95,8 @@ class MainWindow(QMainWindow, WindowMixin):
         self.labelHist = PREDEFINED_CLASSES
         self.lastOpenDir = None
 
-        self.Acce=[]
-        self.UserInfo=[]
+        self.Acce=[False,False,False]
+        self.UserInfo=[0,0,0]
 
         # Whether we need to save or not.
         self.dirty = False
@@ -828,15 +829,15 @@ class MainWindow(QMainWindow, WindowMixin):
         shapes = [format_shape(shape) for shape in self.canvas.shapes]
         # Can add differrent annotation formats here
         try:
-            if self.labelFileFormat == LabelFileFormat.PASCAL_VOC:
-                if annotationFilePath[-4:].lower() != ".xml":
+            if self.labelFileFormat == LabelFileFormat.YOLO:
+                if os.path.splitext(annotationFilePath)[1].lower() != ".json":
+                    annotationFilePath += TXT_EXT
+                self.labelFile.saveYoloFormat(annotationFilePath, shapes, self.filePath, self.imageData, self.labelHist,self.Acce,self.UserInfo,
+                                                   self.lineColor.getRgb(), self.fillColor.getRgb())
+            elif self.labelFileFormat == LabelFileFormat.PASCAL_VOC:
+                if os.path.splitext(annotationFilePath)[1].lower() != ".xml":
                     annotationFilePath += XML_EXT
                 self.labelFile.savePascalVocFormat(annotationFilePath, shapes, self.filePath, self.imageData,
-                                                   self.lineColor.getRgb(), self.fillColor.getRgb())
-            elif self.labelFileFormat == LabelFileFormat.YOLO:
-                if annotationFilePath[-4:].lower() != ".txt":
-                    annotationFilePath += TXT_EXT
-                self.labelFile.saveYoloFormat(annotationFilePath, shapes, self.filePath, self.imageData, self.labelHist,
                                                    self.lineColor.getRgb(), self.fillColor.getRgb())
             else:
                 self.labelFile.save(annotationFilePath, shapes, self.filePath, self.imageData,
@@ -1091,19 +1092,20 @@ class MainWindow(QMainWindow, WindowMixin):
             txtPath = os.path.join(self.defaultSaveDir, basename + TXT_EXT)
 
             """Annotation file priority:
-            PascalXML > YOLO
+            PascalXML < YOLO
             """
-            if os.path.isfile(xmlPath):
-                self.loadPascalXMLByFilename(xmlPath)
-            elif os.path.isfile(txtPath):
+            if os.path.isfile(txtPath):
                 self.loadYOLOTXTByFilename(txtPath)
+            elif os.path.isfile(xmlPath):
+                self.loadPascalXMLByFilename(xmlPath)
         else:
             xmlPath = os.path.splitext(filePath)[0] + XML_EXT
             txtPath = os.path.splitext(filePath)[0] + TXT_EXT
-            if os.path.isfile(xmlPath):
-                self.loadPascalXMLByFilename(xmlPath)
-            elif os.path.isfile(txtPath):
+            if os.path.isfile(txtPath):
                 self.loadYOLOTXTByFilename(txtPath)
+            elif os.path.isfile(xmlPath):
+                self.loadPascalXMLByFilename(xmlPath)
+
 
     def resizeEvent(self, event):
         if self.canvas and not self.image.isNull()\

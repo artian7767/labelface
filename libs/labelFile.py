@@ -8,7 +8,7 @@ except ImportError:
 
 from base64 import b64encode, b64decode
 from libs.pascal_voc_io import PascalVocWriter
-from libs.yolo_io import YOLOWriter
+from libs.yolo_io import YOLOWriter,TXT_EXT
 from libs.pascal_voc_io import XML_EXT
 from enum import Enum
 import os.path
@@ -27,7 +27,8 @@ class LabelFileError(Exception):
 class LabelFile(object):
     # It might be changed as window creates. By default, using XML ext
     # suffix = '.lif'
-    suffix = XML_EXT
+    # suffix = XML_EXT
+    suffix = TXT_EXT
 
     def __init__(self, filename=None):
         self.shapes = ()
@@ -65,7 +66,7 @@ class LabelFile(object):
         writer.save(targetFile=filename)
         return
 
-    def saveYoloFormat(self, filename, shapes, imagePath, imageData, classList,
+    def saveYoloFormat(self, filename, shapes, imagePath, imageData, classList,acce, userinfo,
                             lineColor=None, fillColor=None, databaseSrc=None):
         imgFolderPath = os.path.dirname(imagePath)
         imgFolderName = os.path.split(imgFolderPath)[-1]
@@ -81,7 +82,7 @@ class LabelFile(object):
         imageShape = [image.height(), image.width(),
                       1 if image.isGrayscale() else 3]
         writer = YOLOWriter(imgFolderName, imgFileName,
-                                 imageShape, localImgPath=imagePath)
+                                 imageShape, acce, userinfo, localImgPath=imagePath)
         writer.verified = self.verified
 
         for shape in shapes:
@@ -92,7 +93,7 @@ class LabelFile(object):
             bndbox = LabelFile.convertPoints2BndBox(points)
             writer.addBndBox(bndbox[0], bndbox[1], bndbox[2], bndbox[3], label, difficult)
 
-        writer.save(targetFile=filename, classList=classList)
+        writer.save(targetFile=filename)
         return
 
     def toggleVerify(self):
