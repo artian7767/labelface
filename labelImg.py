@@ -155,6 +155,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.UserIDTextLabel = QLabel()
         self.UserIDTextLabel.setText("UserID")
         self.UserIDTextLine = QLineEdit()
+        self.UserIDTextLine.setText("0")
         UserIDTextQHBoxLayout = QHBoxLayout()
         UserIDTextQHBoxLayout.addWidget(self.UserIDTextLabel)
         UserIDTextQHBoxLayout.addWidget(self.UserIDTextLine)
@@ -178,6 +179,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.AgeTextLabel = QLabel()
         self.AgeTextLabel.setText("Age")
         self.AgeTextLine = QLineEdit()
+        self.AgeTextLine.setText("0")
         AgeTextQHBoxLayout = QHBoxLayout()
         AgeTextQHBoxLayout.addWidget(self.AgeTextLabel)
         AgeTextQHBoxLayout.addWidget(self.AgeTextLine)
@@ -1614,6 +1616,10 @@ class MainWindow(QMainWindow, WindowMixin):
         self.UserInfo=[dic["UserInfo"]["ID"],dic["UserInfo"]["Gender"],dic["UserInfo"]["Age"]]
         print (shapes)
         self.loadLabels(shapes)
+
+        self.UserIDTextLine.setText(str(dic["UserInfo"]["ID"]))
+        self.GenderTextCombo.set
+
         self.maskButton.setChecked(dic["Accessory"]["Mask"])
         self.glassesButton.setChecked(dic["Accessory"]["Glasses"])
         self.capButton.setChecked(dic["Accessory"]["Cap"])
