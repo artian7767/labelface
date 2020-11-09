@@ -91,8 +91,11 @@ class MainWindow(QMainWindow, WindowMixin):
         # For loading all image under a directory
         self.mImgList = []
         self.dirname = None
-        self.labelHist = []
+        self.labelHist = PREDEFINED_CLASSES
         self.lastOpenDir = None
+
+        self.Acce=[]
+        self.UserInfo=[]
 
         # Whether we need to save or not.
         self.dirty = False
@@ -103,7 +106,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.screencast = "https://youtu.be/p0nR2YsCY_U"
 
         # Load predefined classes to the list
-        self.loadPredefinedClasses(defaultPrefdefClassFile)
+        # self.loadPredefinedClasses(defaultPrefdefClassFile)
 
         # Main widgets and related state.
         self.labelDialog = LabelDialog(parent=self, listItem=self.labelHist)
