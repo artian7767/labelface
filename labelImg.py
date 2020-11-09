@@ -1216,6 +1216,13 @@ class MainWindow(QMainWindow, WindowMixin):
 
         path = os.path.dirname(ustr(self.filePath))\
             if self.filePath else '.'
+        if self.labelFileFormat == LabelFileFormat.YOLO:
+            filters = "Open Annotation JSON file (%s)" % ' '.join(['*.json'])
+            filename = ustr(QFileDialog.getOpenFileName(self,'%s - Choose a JSON file' % __appname__, path, filters))
+            if filename:
+                if isinstance(filename, (tuple, list)):
+                    filename = filename[0]
+            self.loadPascalXMLByFilename(filename)
         if self.labelFileFormat == LabelFileFormat.PASCAL_VOC:
             filters = "Open Annotation XML file (%s)" % ' '.join(['*.xml'])
             filename = ustr(QFileDialog.getOpenFileName(self,'%s - Choose a xml file' % __appname__, path, filters))
@@ -1503,6 +1510,9 @@ class MainWindow(QMainWindow, WindowMixin):
         self.set_format(FORMAT_YOLO)
         tYoloParseReader = YoloReader(txtPath)
         shapes = tYoloParseReader.getShapes()
+        dic=tYoloParseReader.getDict()
+        self.Acce=[1 if dic["Accessory"]["Mask"] else 0,1 if dic["Accessory"]["Glasses"] else 0,1 if dic["Accessory"]["Cap"] else 0]
+        self.UserInfo=[dic["UserInfo"]["ID"],dic["UserInfo"]["Gender"],dic["UserInfo"]["Age"]]
         print (shapes)
         self.loadLabels(shapes)
         self.canvas.verified = tYoloParseReader.verified

@@ -180,7 +180,10 @@ class YoloReader:
 
         for object_name in dic["ObjectInfo"]["BoundingBox"].keys():
             if dic["ObjectInfo"]["BoundingBox"][object_name]["isVisible"]:
-                label=object_name
+                if object_name in ["Leye","Reye","Mouth"]:
+                    label=object_name+"_"+"OPEN" if dic["ObjectInfo"]["BoundingBox"][object_name]["Opened"] else object_name+"_" "CLOSED"
+                else:
+                    label=object_name
                 bndbox=dic["ObjectInfo"]["BoundingBox"][object_name]["Position"]
                 difficult = False
                 self.addShape(label, bndbox, difficult)
