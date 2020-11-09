@@ -152,12 +152,53 @@ class MainWindow(QMainWindow, WindowMixin):
         self.capButton.stateChanged.connect(self.btnstate_cap)
 
         # Add some of widgets to listLayout
+        self.UserIDTextLabel = QLabel()
+        self.UserIDTextLabel.setText("UserID")
+        self.UserIDTextLine = QLineEdit()
+        UserIDTextQHBoxLayout = QHBoxLayout()
+        UserIDTextQHBoxLayout.addWidget(self.UserIDTextLabel)
+        UserIDTextQHBoxLayout.addWidget(self.UserIDTextLine)
+        UserIDTextContainer = QWidget()
+        UserIDTextContainer.setLayout(UserIDTextQHBoxLayout)
+
+        self.GenderTextLabel = QLabel()
+        self.GenderTextLabel.setText("Gender( 0:Unknwon , 1: Man , 2:Woman )")
+        self.GenderTextCombo = QComboBox()
+        self.GenderTextCombo.addItem("0")
+        self.GenderTextCombo.addItem("1")
+        self.GenderTextCombo.addItem("2")
+        self.GenderTextCombo.adjustSize()
+        GenderTextQHBoxLayout = QHBoxLayout()
+        GenderTextQHBoxLayout.addWidget(self.GenderTextLabel)
+        GenderTextQHBoxLayout.addWidget(self.GenderTextCombo)
+        GenderTextContainer = QWidget()
+        GenderTextContainer.setLayout(GenderTextQHBoxLayout)
+
+
+        self.AgeTextLabel = QLabel()
+        self.AgeTextLabel.setText("Age")
+        self.AgeTextLine = QLineEdit()
+        AgeTextQHBoxLayout = QHBoxLayout()
+        AgeTextQHBoxLayout.addWidget(self.AgeTextLabel)
+        AgeTextQHBoxLayout.addWidget(self.AgeTextLine)
+        AgeTextContainer = QWidget()
+        AgeTextContainer.setLayout(AgeTextQHBoxLayout)
+
         listLayout.addWidget(self.editButton)
+
+        # listLayout.addWidget(self.UserIDTextLine)
+        # listLayout.addWidget(self.GenderTextLine)
+        # listLayout.addWidget(self.AgeTextLine)
+
+        listLayout.addWidget(UserIDTextContainer)
+        listLayout.addWidget(GenderTextContainer)
+        listLayout.addWidget(AgeTextContainer)
+
         # listLayout.addWidget(self.diffcButton)
         listLayout.addWidget(self.maskButton)
         listLayout.addWidget(self.glassesButton)
         listLayout.addWidget(self.capButton)
-        listLayout.addWidget(useDefaultLabelContainer)
+        # listLayout.addWidget(useDefaultLabelContainer)
 
         # Create and add combobox for showing unique labels in group
         self.comboBox = ComboBox(self)
