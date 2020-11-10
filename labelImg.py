@@ -308,7 +308,7 @@ class MainWindow(QMainWindow, WindowMixin):
                       'Ctrl+S', 'save', getStr('saveDetail'), enabled=False)
 
         isUsingPascalVoc = self.labelFileFormat == LabelFileFormat.PASCAL_VOC
-        save_format = action('&PascalVOC' if isUsingPascalVoc else '&YOLO',
+        save_format = action('&PascalVOC' if isUsingPascalVoc else '&JSON',
                              self.change_format, 'Ctrl+',
                              'format_voc' if isUsingPascalVoc else 'format_yolo',
                              getStr('changeSaveFormat'), enabled=True)
