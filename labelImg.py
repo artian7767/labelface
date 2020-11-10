@@ -1172,6 +1172,12 @@ class MainWindow(QMainWindow, WindowMixin):
                 self.imageData = read(unicodeFilePath, None)
                 self.labelFile = None
                 self.canvas.verified = False
+                self.UserIDTextLine.setText("0")
+                self.GenderTextRadio_0.setChecked(True)
+                self.AgeTextLine.setText("0")
+                self.maskButton.setChecked(False)
+                self.capButton.setChecked(False)
+                self.glassesButton.setChecked(False)
 
             if isinstance(self.imageData, QImage):
                 image = self.imageData
