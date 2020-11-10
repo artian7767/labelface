@@ -96,7 +96,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.lastOpenDir = None
 
         self.Acce={False,False,False} #[Mask,Glasses,Cap]
-        self.UserInfo=[0,0,0]
+        self.UserInfo=[0,0,0] # UserID,Gender,Age
 
         # Whether we need to save or not.
         self.dirty = False
@@ -163,15 +163,26 @@ class MainWindow(QMainWindow, WindowMixin):
         UserIDTextContainer.setLayout(UserIDTextQHBoxLayout)
 
         self.GenderTextLabel = QLabel()
-        self.GenderTextLabel.setText("Gender( 0:Unknwon , 1: Man , 2:Woman )")
-        self.GenderTextCombo = QComboBox()
-        self.GenderTextCombo.addItem("0")
-        self.GenderTextCombo.addItem("1")
-        self.GenderTextCombo.addItem("2")
-        self.GenderTextCombo.adjustSize()
+        self.GenderTextLabel.setText("Gender : ")
+        self.GenderTextRadio_0 = QRadioButton()
+        self.GenderTextRadio_1 = QRadioButton()
+        self.GenderTextRadio_2 = QRadioButton()
+        self.GenderTextRadio_0.setText("Unknown")
+        self.GenderTextRadio_1.setText("Man")
+        self.GenderTextRadio_2.setText("Woman")
+        self.GenderTextRadio_0.setChecked(True)
+        self.GenderTextRadio_0.toggled.connect(self.radioChanged)
+        self.GenderTextRadio_1.toggled.connect(self.radioChanged)
+        self.GenderTextRadio_2.toggled.connect(self.radioChanged)
+
         GenderTextQHBoxLayout = QHBoxLayout()
         GenderTextQHBoxLayout.addWidget(self.GenderTextLabel)
-        GenderTextQHBoxLayout.addWidget(self.GenderTextCombo)
+        GenderTextQHBoxLayout.addWidget(self.GenderTextRadio_0)
+        GenderTextQHBoxLayout.addWidget(self.GenderTextRadio_1)
+        GenderTextQHBoxLayout.addWidget(self.GenderTextRadio_2)
+
+
+
         GenderTextContainer = QWidget()
         GenderTextContainer.setLayout(GenderTextQHBoxLayout)
 
@@ -983,6 +994,17 @@ class MainWindow(QMainWindow, WindowMixin):
         else:  # User probably changed item visibility
             self.canvas.setShapeVisible(shape, item.checkState() == Qt.Checked)
 
+    def radioChanged(self):
+
+        if self.GenderTextRadio_1.isChecked():
+            self.UserInfo[1]=1
+        elif self.GenderTextRadio_2.isChecked():
+            self.UserInfo[1]=2
+        else:
+            self.UserInfo[1] = 0
+
+        self.setDirty()
+
     # Callback functions:
     def newShape(self):
         """Pop-up and give focus to the label editor.
@@ -1614,11 +1636,18 @@ class MainWindow(QMainWindow, WindowMixin):
         dic=tYoloParseReader.getDict()
         self.Acce=[dic["Accessory"]["Mask"],dic["Accessory"]["Glasses"],dic["Accessory"]["Cap"]]
         self.UserInfo=[dic["UserInfo"]["ID"],dic["UserInfo"]["Gender"],dic["UserInfo"]["Age"]]
-        print (shapes)
+        # print (shapes)
         self.loadLabels(shapes)
 
         self.UserIDTextLine.setText(str(dic["UserInfo"]["ID"]))
-        self.GenderTextCombo.set
+        if int(dic["UserInfo"]["Gender"])==0:
+            self.GenderTextRadio_0.setChecked(True)
+        elif int(dic["UserInfo"]["Gender"])==1:
+            self.GenderTextRadio_1.setChecked(True)
+        elif int(dic["UserInfo"]["Gender"])==2:
+            self.GenderTextRadio_0.setChecked(True)
+
+        self.AgeTextLine.setText(str(dic["UserInfo"]["Age"]))
 
         self.maskButton.setChecked(dic["Accessory"]["Mask"])
         self.glassesButton.setChecked(dic["Accessory"]["Glasses"])
