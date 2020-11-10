@@ -156,6 +156,8 @@ class MainWindow(QMainWindow, WindowMixin):
         self.UserIDTextLabel.setText("UserID")
         self.UserIDTextLine = QLineEdit()
         self.UserIDTextLine.setText("0")
+        self.UserIDTextLine.textChanged.connect(self.textLineChanged_userID)
+
         UserIDTextQHBoxLayout = QHBoxLayout()
         UserIDTextQHBoxLayout.addWidget(self.UserIDTextLabel)
         UserIDTextQHBoxLayout.addWidget(self.UserIDTextLine)
@@ -196,6 +198,7 @@ class MainWindow(QMainWindow, WindowMixin):
         AgeTextQHBoxLayout.addWidget(self.AgeTextLine)
         AgeTextContainer = QWidget()
         AgeTextContainer.setLayout(AgeTextQHBoxLayout)
+        self.AgeTextLine.textChanged.connect(self.textLineChanged_Age)
 
         listLayout.addWidget(self.editButton)
 
@@ -842,6 +845,15 @@ class MainWindow(QMainWindow, WindowMixin):
                 self.setDirty()
         except:
             pass
+
+    def textLineChanged_userID(self):
+        self.UserInfo[0]=int(self.UserIDTextLine.text())
+        self.setDirty()
+
+    def textLineChanged_Age(self):
+        self.UserInfo[2]=int(self.UserIDTextLine.text())
+        self.setDirty()
+
 
 
     # React to canvas signals.
