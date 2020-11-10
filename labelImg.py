@@ -128,6 +128,7 @@ class MainWindow(QMainWindow, WindowMixin):
         useDefaultLabelQHBoxLayout.addWidget(self.defaultLabelTextLine)
         useDefaultLabelContainer = QWidget()
         useDefaultLabelContainer.setLayout(useDefaultLabelQHBoxLayout)
+        useDefaultLabelContainer.setVisible(False)
 
         # Create a widget for edit and diffc button
         self.diffcButton = QCheckBox(getStr('useDifficult'))
