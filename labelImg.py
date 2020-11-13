@@ -1389,6 +1389,7 @@ class MainWindow(QMainWindow, WindowMixin):
         else:
             targetDirPath = ustr(defaultOpenDirPath)
         self.lastOpenDir = targetDirPath
+        self.defaultSaveDir= targetDirPath
         self.importDirImages(targetDirPath)
 
     def importDirImages(self, dirpath):
