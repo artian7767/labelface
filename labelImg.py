@@ -852,7 +852,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.setDirty()
 
     def textLineChanged_Age(self):
-        self.UserInfo[2]=int(self.UserIDTextLine.text())
+        self.UserInfo[2]=int(self.AgeTextLine.text())
         self.setDirty()
 
 
@@ -1665,7 +1665,7 @@ class MainWindow(QMainWindow, WindowMixin):
         elif int(dic["UserInfo"]["Gender"])==1:
             self.GenderTextRadio_1.setChecked(True)
         elif int(dic["UserInfo"]["Gender"])==2:
-            self.GenderTextRadio_0.setChecked(True)
+            self.GenderTextRadio_2.setChecked(True)
 
         self.AgeTextLine.setText(str(dic["UserInfo"]["Age"]))
 
