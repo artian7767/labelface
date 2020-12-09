@@ -156,6 +156,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.UserIDTextLabel = QLabel()
         self.UserIDTextLabel.setText("UserID")
         self.UserIDTextLine = QLineEdit()
+        self.UserIDTextLine.setValidator(QIntValidator(self))
         self.UserIDTextLine.setText("0")
         self.UserIDTextLine.textChanged.connect(self.textLineChanged_userID)
 
@@ -193,6 +194,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.AgeTextLabel = QLabel()
         self.AgeTextLabel.setText("Age")
         self.AgeTextLine = QLineEdit()
+        self.AgeTextLine.setValidator(QIntValidator(self))
         self.AgeTextLine.setText("0")
         AgeTextQHBoxLayout = QHBoxLayout()
         AgeTextQHBoxLayout.addWidget(self.AgeTextLabel)
@@ -848,12 +850,21 @@ class MainWindow(QMainWindow, WindowMixin):
             pass
 
     def textLineChanged_userID(self):
-        self.UserInfo[0]=int(self.UserIDTextLine.text())
-        self.setDirty()
+        if self.UserIDTextLine.text()=="":
+            self.UserInfo[0] =0
+        else:
+            if self.UserIDTextLine.text().isdigit():
+                self.UserInfo[0] = int(self.UserIDTextLine.text())
+                self.setDirty()
 
     def textLineChanged_Age(self):
-        self.UserInfo[2]=int(self.AgeTextLine.text())
-        self.setDirty()
+
+        if self.AgeTextLine.text()=="":
+            self.UserInfo[2]=0
+        else:
+            if self.AgeTextLine.text().isdigit():
+                self.UserInfo[2]=int(self.AgeTextLine.text())
+                self.setDirty()
 
 
 
