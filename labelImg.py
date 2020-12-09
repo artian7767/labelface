@@ -1553,10 +1553,17 @@ class MainWindow(QMainWindow, WindowMixin):
 
     def deleteImg(self):
         deletePath = self.filePath
+        basepath_name,ext = os.path.splitext(deletePath)
+        anno_xmlPath = deletePath.replace(ext,XML_EXT)
+        anno_txtPath = deletePath.replace(ext,TXT_EXT)
         if deletePath is not None:
             self.openNextImg()
             if os.path.exists(deletePath):
                 os.remove(deletePath)
+                if os.path.exists(anno_xmlPath):
+                    os.remove(anno_xmlPath)
+                if os.path.exists(anno_txtPath):
+                    os.remove(anno_txtPath)
             self.importDirImages(self.lastOpenDir)
 
     def resetAll(self):
