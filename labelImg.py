@@ -95,7 +95,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.labelHist = PREDEFINED_CLASSES
         self.lastOpenDir = None
 
-        self.Acce={False,False,False} #[Mask,Glasses,Cap]
+        self.Acce=[False,False,False] #[Mask,Glasses,Cap]
         self.UserInfo=[0,0,0] # UserID,Gender,Age
 
         # Whether we need to save or not.
