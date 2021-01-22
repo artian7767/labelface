@@ -1,4 +1,4 @@
-LabelImg
+LabelImg for AIDATA
 ========
 
 .. image:: https://img.shields.io/pypi/v/labelimg.svg
