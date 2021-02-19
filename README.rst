@@ -1,221 +1,43 @@
 LabelImg for AIDATA
 ========
 
-.. image:: https://img.shields.io/pypi/v/labelimg.svg
-        :target: https://pypi.python.org/pypi/labelimg
+졸음운전 예방을 위한 운전자 상태 정보 (통제환경) 데이터 가공을 위한 어노테이션 도구.
 
-.. image:: https://img.shields.io/travis/tzutalin/labelImg.svg
-        :target: https://travis-ci.org/tzutalin/labelImg
 
-.. image:: /resources/icons/app.png
-    :width: 200px
-    :align: center
+`LabelImg<https://github.com/tzutalin/labelImg>` 기반으로 작성되어, JSON 형식으로 어노테이션을 저장합니다.
 
-LabelImg is a graphical image annotation tool.
 
-It is written in Python and uses Qt for its graphical interface.
-
-Annotations are saved as XML files in PASCAL VOC format, the format used
-by `ImageNet <http://www.image-net.org/>`__.  Besides, it also supports YOLO format
-
-.. image:: https://raw.githubusercontent.com/tzutalin/labelImg/master/demo/demo3.jpg
-     :alt: Demo Image
-
-.. image:: https://raw.githubusercontent.com/tzutalin/labelImg/master/demo/demo.jpg
-     :alt: Demo Image
-
-`Watch a demo video <https://youtu.be/p0nR2YsCY_U>`__
-
-Installation
+설치 및 빌드(Installation & Build)
 ------------------
 
+`LabelImg<https://github.com/tzutalin/labelImg>`의 설치 방법과 동일합니다.
 
-Build from source
-~~~~~~~~~~~~~~~~~
-
-Linux/Ubuntu/Mac requires at least `Python
-2.6 <https://www.python.org/getit/>`__ and has been tested with `PyQt
-4.8 <https://www.riverbankcomputing.com/software/pyqt/intro>`__. However, `Python
-3 or above <https://www.python.org/getit/>`__ and  `PyQt5 <https://pypi.org/project/PyQt5/>`__ are strongly recommended.
-
-
-Ubuntu Linux
-^^^^^^^^^^^^
-Python 2 + Qt4
-
+- Build from source 이하를 운영체제에 맞게 실행함. 모두 Python 기반 환경을 구축하고 관련 종속 라이브러리를 설치하고 빌드 합니다.
+- Python 기반 환경 구축 : Python 3.x 버전 권장(Anaconda 설치 환경 권장)
+- 종속 라이브러리 설치 : 하기의 명령어를 Shell, Prompt 등에서 실행(단, 현재 경로는 본 레포로 되어 있어야 함)
 .. code:: shell
+        conda install pyqt=5
+        conda install -c anaconda lxml
+        pyrcc5 -o libs/resources.py resources.qrc
+        pip install pyinstaller
 
-    sudo apt-get install pyqt4-dev-tools
-    sudo pip install lxml
-    make qt4py2
-    python labelImg.py
-    python labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
-
-Python 3 + Qt5 (Recommended)
-
+- 실행 방법 1 : 코드로 실행
 .. code:: shell
-
-    sudo apt-get install pyqt5-dev-tools
-    sudo pip3 install -r requirements/requirements-linux-python3.txt
-    make qt5py3
-    python3 labelImg.py
-    python3 labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
-
-macOS
-^^^^^
-Python 2 + Qt4
-
+        python labelImg.py
+  
+- 실행 방법 2 : 빌드 후에 실행
 .. code:: shell
+        cd <repo>/build-tools/
+        pyinstaller --hidden-import=xml --hidden-import=xml.etree --hidden-import=xml.etree.ElementTree --hidden-import=lxml.etree -D -F -n labelImg -c "../labelImg.py" -p ../libs -p ../
 
-    brew install qt qt4
-    brew install libxml2
-    make qt4py2
-    python labelImg.py
-    python labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
+을 실행하면 "<repo>/build-tools/build" "<repo>/build-tools/dist"가 "<repo>/build-tools/labelImg.spec"이 생성되며,  "<repo>/build-tools/dist" 내에 빌드된 실행파일(labelImg.exe)이 생성됨.
 
-Python 3 + Qt5 (Recommended)
-
-.. code:: shell
-
-    brew install qt  # Install qt-5.x.x by Homebrew
-    brew install libxml2
-
-    or using pip
-
-    pip3 install pyqt5 lxml # Install qt and lxml by pip
-
-    make qt5py3
-    python3 labelImg.py
-    python3 labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
+labelImg.exe를 더블클릭하여 실행.
 
 
-Python 3 Virtualenv (Recommended)
-
-Virtualenv can avoid a lot of the QT / Python version issues
-
-.. code:: shell
-
-    brew install python3
-    pip3 install pipenv
-    pipenv run pip install pyqt5==5.13.2 lxml
-    pipenv run make qt5py3
-    python3 labelImg.py
-    [Optional] rm -rf build dist; python setup.py py2app -A;mv "dist/labelImg.app" /Applications
-
-Note: The Last command gives you a nice .app file with a new SVG Icon in your /Applications folder. You can consider using the script: build-tools/build-for-macos.sh
 
 
-Windows
-^^^^^^^
-
-Install `Python <https://www.python.org/downloads/windows/>`__,
-`PyQt5 <https://www.riverbankcomputing.com/software/pyqt/download5>`__
-and `install lxml <http://lxml.de/installation.html>`__.
-
-Open cmd and go to the `labelImg <#labelimg>`__ directory
-
-.. code:: shell
-
-    pyrcc4 -o lib/resources.py resources.qrc
-    For pyqt5, pyrcc5 -o libs/resources.py resources.qrc
-
-    python labelImg.py
-    python labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
-
-Windows + Anaconda
-^^^^^^^^^^^^^^^^^^
-
-Download and install `Anaconda <https://www.anaconda.com/download/#download>`__ (Python 3+)
-
-Open the Anaconda Prompt and go to the `labelImg <#labelimg>`__ directory
-
-.. code:: shell
-
-    conda install pyqt=5
-    conda install -c anaconda lxml
-    pyrcc5 -o libs/resources.py resources.qrc
-    python labelImg.py
-    python labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
-
-Get from PyPI but only python3.0 or above
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-This is the simplest (one-command) install method on modern Linux distributions such as Ubuntu and Fedora.
-
-.. code:: shell
-
-    pip3 install labelImg
-    labelImg
-    labelImg [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
-
-
-Use Docker
-~~~~~~~~~~~~~~~~~
-.. code:: shell
-
-    docker run -it \
-    --user $(id -u) \
-    -e DISPLAY=unix$DISPLAY \
-    --workdir=$(pwd) \
-    --volume="/home/$USER:/home/$USER" \
-    --volume="/etc/group:/etc/group:ro" \
-    --volume="/etc/passwd:/etc/passwd:ro" \
-    --volume="/etc/shadow:/etc/shadow:ro" \
-    --volume="/etc/sudoers.d:/etc/sudoers.d:ro" \
-    -v /tmp/.X11-unix:/tmp/.X11-unix \
-    tzutalin/py2qt4
-
-    make qt4py2;./labelImg.py
-
-You can pull the image which has all of the installed and required dependencies. `Watch a demo video <https://youtu.be/nw1GexJzbCI>`__
-
-
-Usage
------
-
-Steps (PascalVOC)
-~~~~~~~~~~~~~~~~~
-
-1. Build and launch using the instructions above.
-2. Click 'Change default saved annotation folder' in Menu/File
-3. Click 'Open Dir'
-4. Click 'Create RectBox'
-5. Click and release left mouse to select a region to annotate the rect
-   box
-6. You can use right mouse to drag the rect box to copy or move it
-
-The annotation will be saved to the folder you specify.
-
-You can refer to the below hotkeys to speed up your workflow.
-
-Steps (YOLO)
-~~~~~~~~~~~~
-
-1. In ``data/predefined_classes.txt`` define the list of classes that will be used for your training.
-
-2. Build and launch using the instructions above.
-
-3. Right below "Save" button in the toolbar, click "PascalVOC" button to switch to YOLO format.
-
-4. You may use Open/OpenDIR to process single or multiple images. When finished with a single image, click save.
-
-A txt file of YOLO format will be saved in the same folder as your image with same name. A file named "classes.txt" is saved to that folder too. "classes.txt" defines the list of class names that your YOLO label refers to.
-
-Note:
-
-- Your label list shall not change in the middle of processing a list of images. When you save an image, classes.txt will also get updated, while previous annotations will not be updated.
-
-- You shouldn't use "default class" function when saving to YOLO format, it will not be referred.
-
-- When saving as YOLO format, "difficult" flag is discarded.
-
-Create pre-defined classes
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-You can edit the
-`data/predefined\_classes.txt <https://github.com/tzutalin/labelImg/blob/master/data/predefined_classes.txt>`__
-to load pre-defined classes
-
-Hotkeys
+단축키(Hotkeys)
 ~~~~~~~
 
 +--------------------+--------------------------------------------+
@@ -246,15 +68,6 @@ Hotkeys
 | ↑→↓←             |  Keyboard arrows to move selected rect box   |
 +--------------------+--------------------------------------------+
 
-**Verify Image:**
-
-When pressing space, the user can flag the image as verified, a green background will appear.
-This is used when creating a dataset automatically, the user can then through all the pictures and flag them instead of annotate them.
-
-**Difficult:**
-
-The difficult field is set to 1 indicates that the object has been annotated as "difficult", for example, an object which is clearly visible but difficult to recognize without substantial use of context.
-According to your deep neural network implementation, you can include or exclude difficult objects during training.
 
 How to reset the settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -265,11 +78,6 @@ In case there are issues with loading the classes, you can either:
 2. Remove the `.labelImgSettings.pkl` from your home directory. In Linux and Mac you can do:
     `rm ~/.labelImgSettings.pkl`
 
-
-How to contribute
-~~~~~~~~~~~~~~~~~
-
-Send a pull request
 
 License
 ~~~~~~~
