@@ -10,7 +10,8 @@ LabelImg for AIDATA
 설치 및 빌드(Installation & Build)
 ------------------
 
-`LabelImg <https://github.com/tzutalin/labelImg>`__의 설치 방법과 동일합니다.
+
+`LabelImg <https://github.com/tzutalin/labelImg>`__ 의 설치 방법과 동일합니다.
 
 - Build from source 이하를 운영체제에 맞게 실행함. 모두 Python 기반 환경을 구축하고 관련 종속 라이브러리를 설치하고 빌드 합니다.
 - Python 기반 환경 구축 : Python 3.x 버전 권장(Anaconda 설치 환경 권장)
